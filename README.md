@@ -33,4 +33,6 @@ npm init
 $ npm start
 ```
 
++ for use the (activate, pass recovery, add new marker), you must config a gmail account, do it in the ./config/utils.js file.
+
 The app is not finish yet, was a prototype for the software laboratory subject, feel free to improve or use it.

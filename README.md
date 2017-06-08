@@ -33,4 +33,4 @@ npm init
 $ npm start
 ```
 
-The app
+The app is not finish yet, was a prototype for the software laboratory subject, feel free to improve or use it.

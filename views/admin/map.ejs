@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"
+   integrity="sha512-07I2e+7D8p6he1SIM+1twR5TIrhUQn9+I6yjqD53JQjFiMf8EtC93ty0/5vJTZGF8aAocvHYNEDJajGdNx1IsQ=="
+   crossorigin=""/>
+   <style media="screen">
+     #mapid { height: 600px; }
+   </style>
+    <% include ../partials/head %>
+
+  </head>
+  <body>
+    <header>
+      <% include ../partials/header_admin %>
+    </header>
+    <div class="container">
+      <main>
+          <div class="row">
+            <div class="col-md-3" id="newmarker">
+              <h4>Agregar Nuevo Contenido</h4>
+              <hr>
+              <form action="/admin/map" method="post" encType="multipart/form-data">
+                <div class="form-group">
+                  <label for="name">Nombre</label>
+                  <input type="text" class="form-control" id="name" name="name" placeholder="Nombre" required>
+                </div>
+                <div class="form-group">
+                  <label for="lat">Latitud</label>
+                  <input type="text" class="form-control" id="lat" name="lat" placeholder="Latitud"  required>
+                </div>
+                <div class="form-group">
+                  <label for="lon">Longitud</label>
+                  <input type="text" class="form-control" id="lon" name="lon" placeholder="Longitud"  required>
+                </div>
+                <div class="form-group">
+                  <label for="description">Descripcion</label>
+                  <textarea class="form-control" rows="5" id="description" name="description" required></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="type">Tipo</label>
+                  <select class="form-control" id="tipo" name="type">
+                    <% payload.interests.forEach((key) => { %>
+                      <option value="<%- key %>"><%- key %></option>
+                    <% }); %>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="media">Multimedia</label>
+                  <input type="file" name="media" required />
+                </div>
+                <div>
+                  <button id="addmarker" type="submit" class="btn btn-primary form-control">Submit</button>
+                </div>
+                <br>
+                <div class="form-group">
+                  <span class="label label-warning" id='info-message'></span>
+                </div>
+              </form>
+            </div>
+
+            <div class="col-md-9" id="mapid"></div>
+
+            <div class="col-md-3" id="modify">
+              <h4>Modificar Contenido</h4>
+              <hr>
+              <form action="/admin/map/update" method="post" encType="multipart/form-data">
+                <div class="form-group">
+                  <label for="name_up">Nombre</label>
+                  <input type="text" class="form-control" id="name_up" name="name_up" placeholder="Nombre" required>
+                </div>
+                <div class="form-group">
+                  <label for="lat_up">Latitud</label>
+                  <input type="text" class="form-control" id="lat_up" name="lat_up" placeholder="Latitud"  required>
+                </div>
+                <div class="form-group">
+                  <label for="lon_up">Longitud</label>
+                  <input type="text" class="form-control" id="lon_up" name="lon_up" placeholder="Longitud"  required>
+                </div>
+                <div class="form-group">
+                  <label for="description_up">Descripcion</label>
+                  <textarea class="form-control" rows="5" id="description_up" name="description_up" required></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="type_up">Tipo</label>
+                  <select class="form-control" id="type_up" name="type_up">
+                    <% payload.interests.forEach((key) => { %>
+                      <option value="<%- key %>"><%- key %></option>
+                    <% }); %>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Desactivar marcador?</label><br>
+                  <div class="radio">
+                    <label>
+                      <input type="radio" name="active" id="active" value="false">
+                      Si
+                    </label>
+                  </div>
+                  <div class="radio">
+                    <label>
+                      <input type="radio" name="active" id="active" value="true" checked>
+                      No
+                    </label>
+                  </div>
+                </div>
+                <input type="hidden" id="marker_up_id" name="marker_id" />
+                <div>
+                  <button type="submit" class="btn btn-primary form-control">Actualizar</button>
+                </div>
+                <br>
+                <div class="form-group">
+                  <span class="label label-warning" id='info-message'></span>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <% if (payload) { %>
+            <script type="text/javascript">
+              let interests = [];
+              let markers = [];
+              let urlserver = '<%= payload.urlimg %>';
+              <% payload.interests.forEach((key) => { %>
+                console.log('<%- key %>');
+                interests.push('<%- key %>');
+              <% }); %>
+
+              markers = <%- payload.markers %>;
+              console.log(interests);
+              console.log(markers);
+            </script>
+          <% } %>
+
+      </main>
+    </div>
+    <%include ../partials/footer %>
+
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js" integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg==" crossorigin=""></script>
+
+    <script src="/javascripts/leaflet.awesome-markers.js"></script>
+    <script src="/javascripts/markers_style.js"></script>
+    <script type="text/javascript">
+      $("#modify").toggle()
+      let lat = document.querySelector('#lat');
+      let lon = document.querySelector('#lon');
+
+      let lat_up = document.querySelector('#lat_up');
+      let lon_up = document.querySelector('#lon_up');
+
+      let mkloaded = {}
+      let editing = false;
+      /*
+      var hoteles = new L.layerGroup();
+      var restaurantes = new L.layerGroup();
+      */
+      var cur_layers = {};
+      var layer_names = [];
+      for (let i = 0; i < interests.length; ++i) {
+        cur_layers[interests[i]] = new L.layerGroup();
+        layer_names.push(interests[i]);
+      }
+      console.log(cur_layers);
+      var mymap = L.map('mapid').setView([4.81333, -75.69611], 15);
+
+      if (markers) {
+        for (let i = 0; i < markers.length; i++) {
+            if(!markers[i].active) continue;
+            mkloaded[markers[i]._id] = markers[i];
+            var mkt = L.marker([markers[i].lat, markers[i].lon], {icon : markerIcons[markers[i].type]}).addTo(cur_layers[markers[i].type]);
+            let html = "<h4>" + markers[i].name + "</h4>" + " <br>"
+            html += '<img src="' + urlserver + 'media/' + markers[i].namemedia + '" width="250px" alt=" event image"/>'
+            html += "<p>" + markers[i].description + "</p>"
+            html +=  "<input type='hidden' value='*" + markers[i]._id + "*' />"
+            mkt.bindPopup(html);
+            mkt.addEventListener('click', modify_marker);
+            console.log(html);
+        }
+      }
+
+      function modify_marker(event) {
+        $('#modify').toggle('slow', () => {
+          $('#newmarker').toggle('slow');
+          editing ^= true;
+          let id_my = event.target._popup._content.split('*')[1];
+          let markertoup = mkloaded[id_my];
+          let name_up = document.querySelector('#name_up');
+
+          let description_up = document.querySelector('#description_up');
+          let markeridup = document.querySelector('#marker_up_id');
+          let type_up = document.querySelector('#type_up');
+
+          console.log(markertoup.name + ' ' + markertoup.lat + ' ' + markertoup.lon)
+
+          name_up.value = markertoup.name;
+          lat_up.value = markertoup.lat;
+          lon_up.value = markertoup.lon;
+          description_up.value = markertoup.description;
+          type_up.value = markertoup.type;
+          //type_up.innerHTML = markertoup.type;
+          markeridup.value = markertoup._id;
+
+          console.log(id_my);
+          console.log(markertoup);
+          console.log(event);
+        });
+      }
+
+      mbUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiY2FybG9zNHJpYXMiLCJhIjoiY2oycTZ2cTZwMDJmZDMzbm5va3JlcTRiYiJ9.8ThnPbr6MsL9jKJvWQOzAg';
+
+      var grayscale   = L.tileLayer(mbUrl, {id: 'mapbox.light'}),
+    		streets  = L.tileLayer(mbUrl, {id: 'mapbox.streets'});
+
+
+      L.tileLayer('https://api.mapbox.com/styles/v1/carlos4rias/cj2vvtnlj000m2rpaawmien1z/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY2FybG9zNHJpYXMiLCJhIjoiY2oycTZ2cTZwMDJmZDMzbm5va3JlcTRiYiJ9.8ThnPbr6MsL9jKJvWQOzAg', {
+          attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+          maxZoom: 15,
+          minZoom: 10,
+          layers: layer_names,
+          id: 'your.mapbox.project.id',
+          accessToken: 'pk.eyJ1IjoiY2FybG9zNHJpYXMiLCJhIjoiY2oycTZ2cTZwMDJmZDMzbm5va3JlcTRiYiJ9.8ThnPbr6MsL9jKJvWQOzAg'
+      }).addTo(mymap);
+
+
+      var baseLayers = {
+    		"Grayscale": grayscale,
+    		"Streets": streets
+    	};
+
+      // L.control.layers(baseLayers, overlays).addTo(mymap);
+      L.control.layers(baseLayers, cur_layers).addTo(mymap);
+
+      function onMapClick(e) {
+          if (!editing) {
+            lat.value = e.latlng.lat;
+            lon.value = e.latlng.lng;
+          } else {
+            lat_up.value = e.latlng.lat;
+            lon_up.value = e.latlng.lng;
+          }
+          // var newmarker = L.marker([e.latlng.lat, e.latlng.lng]).addTo(mymap);
+          // newmarker.bindPopup("<b>a newmarker</b>");
+      }
+
+      mymap.on('click', onMapClick);
+
+   </script>
+  </body>
+</html>

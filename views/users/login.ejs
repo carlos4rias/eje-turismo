@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include ../partials/head %>
+  </head>
+  <body>
+    <header>
+      <% include ../partials/header %>
+    </header>
+    <div class="container">
+      <% if (message.length > 0) { %>
+          <div class="alert alert-danger"><%= message %></div>
+      <% } %>
+    <main>
+      <div class="row">
+        <div class="col-sm-6 col-sm-offset-3">
+          <h3>Login</h3>
+          <form action='/user/login' method='post'>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+            </div>
+              <input type="submit" id="login" class="btn btn-primary form-control" value="login">
+              <span><a href="/user/password_recovery">Olvidaste tu contrasena?</a></span>
+              <span id='errorLogin'></span>
+          </form>
+        </div>
+      </div>
+    </main>
+    </div>
+    <%include ../partials/footer %>
+  </body>
+</html>

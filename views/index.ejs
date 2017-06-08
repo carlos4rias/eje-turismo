@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"
+     integrity="sha512-07I2e+7D8p6he1SIM+1twR5TIrhUQn9+I6yjqD53JQjFiMf8EtC93ty0/5vJTZGF8aAocvHYNEDJajGdNx1IsQ=="
+     crossorigin=""
+    />
+     <style media="screen">
+       #map { height: 1406px; }
+     </style>
+    <% include partials/head %>
+  </head>
+  <body>
+
+    <div class="container-fluid">
+
+      <div class="embed-responsive embed-responsive-16by9">
+      	<div id="background">
+            <div id="map"></div>
+        </div>
+        <header>
+          <% include partials/header %>
+        </header>
+        <div class="container">
+          <main>
+            <div class="row">
+              <div class="col-md-4 col-md-offset-4 greenback" id="greenback">
+                <h1 class='text-center text text-info'>Bienvenido!</h1>
+                <hr>
+                <div>
+                  <a href="/user/signup" class="btn btn-success btn form-control"> Registrate!</a>
+                </div>
+                <hr>
+                <div>
+                  <a href="/user/login" class="btn btn-info form-control"> Ingresa si ya estas registrado!</a>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+
+    </div>
+    <%include partials/footer %>
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js" integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg==" crossorigin=""></script>
+    <script type="text/javascript">
+      var mymap = L.map('map').setView([4.81333, -75.69611], 15);
+
+      L.tileLayer('https://api.mapbox.com/styles/v1/carlos4rias/cj2vvtnlj000m2rpaawmien1z/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY2FybG9zNHJpYXMiLCJhIjoiY2oycTZ2cTZwMDJmZDMzbm5va3JlcTRiYiJ9.8ThnPbr6MsL9jKJvWQOzAg', {
+          attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+          maxZoom: 15,
+          minZoom: 10,
+          id: 'your.mapbox.project.id',
+          accessToken: 'pk.eyJ1IjoiY2FybG9zNHJpYXMiLCJhIjoiY2oycTZ2cTZwMDJmZDMzbm5va3JlcTRiYiJ9.8ThnPbr6MsL9jKJvWQOzAg'
+      }).addTo(mymap);
+
+      $(window).scroll(function(){
+        $("#greenback").stop().animate({"marginTop": ($(window).scrollTop()) + "px", "marginRight":($(window).scrollLeft()) + "px"}, "slow" );
+      });
+   </script>
+  </body>
+</html>

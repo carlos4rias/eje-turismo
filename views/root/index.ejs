@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include ../partials/head %>
+  </head>
+  <body>
+    <header>
+      <% include ../partials/header_root %>
+    </header>
+    <div class="container">
+      <main>
+        <div class="row">
+          <div class="col-md-3">
+            <img src="https://avatars1.githubusercontent.com/u/8406261"  alt="user profile" class="center img-thumbnail" />
+            <hr>
+            <% if (user) { %>
+              <table class="table table-striped">
+                <tr><td><strong><%= user.email %></strong></td></tr>
+                <tr><td><strong><%= user.name %></strong></td></tr>
+                <tr><td><strong><%= user.dni %></strong></td></tr>
+                <tr><td><strong><%= user.phone %></strong></td></tr>
+                <tr><td><strong><%= user.city %></strong></td></tr>
+              </table>
+            <% } %>
+            <hr>
+          </div>
+          <div class="col-md-9">
+            <% if (admins) { %>
+              <table class="table table-striped">
+              <tr>
+                <th colspan="4" class="text-center">Usuarios Inactivos</th>
+              </tr>
+              <tr>
+                <th>Foto</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <!-- <th>Intereses</th> -->
+                <th>Activar</th>
+              </tr>
+
+                <% admins.forEach(function(admin) { %>
+                  <% if (!admin.local.active && admin.local.role === 'admin') { %>
+                    <tr>
+                      <td><img src="https://avatars1.githubusercontent.com/u/8406261" width="50" alt="user profile" class="center img-thumbnail" /></td>
+                      <td><strong><%= admin.local.name %></strong></td>
+                      <td><strong><%= admin.local.email %></strong></td>
+
+
+                      <td><a href="/root/activation/<%- admin._id %>"  class="btn btn-sm btn-warning"> activar</a></td>
+                    </tr>
+                  <% } %>
+                <% }) %>
+              </table>
+              <br><hr><br>
+              <table class="table table-striped">
+              <tr>
+                <th colspan="4" class="text-center">Usuarios Activos</th>
+              </tr>
+              <tr>
+                <th>Foto</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <!-- <th>Intereses</th> -->
+                <th>Desactivar</th>
+              </tr>
+
+                <% admins.forEach(function(admin) { %>
+                  <% if (admin.local.active && admin.local.role === 'admin') { %>
+                    <tr>
+                      <td><img src="https://avatars1.githubusercontent.com/u/8406261" width="50" alt="user profile" class="center img-thumbnail" /></td>
+                      <td><strong><%= admin.local.name %></strong></td>
+                      <td><strong><%= admin.local.email %></strong></td>
+
+
+                      <td><a href="/root/deactivation/<%- admin._id %>"  class="btn btn-sm btn-info"> desactivar</a></td>
+                    </tr>
+                  <% } %>
+                <% }) %>
+              </table>
+            <% } %>
+          </div>
+        </div>
+      </main>
+    </div>
+    <%include ../partials/footer %>
+  </body>
+</html>
+
+</script>

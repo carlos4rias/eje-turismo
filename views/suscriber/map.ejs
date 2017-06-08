@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include ../partials/head %>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"
+    integrity="sha512-07I2e+7D8p6he1SIM+1twR5TIrhUQn9+I6yjqD53JQjFiMf8EtC93ty0/5vJTZGF8aAocvHYNEDJajGdNx1IsQ=="
+    crossorigin=""/>
+    <style media="screen">
+    #mapid { height: 600px; }
+    </style>
+
+  </head>
+  <body>
+    <header>
+      <% include ../partials/header_suscriber %>
+    </header>
+    <div class="container">
+      <main>
+          <div class="row">
+            <div class="col-md-3">
+              <img src="https://avatars1.githubusercontent.com/u/8406261"  alt="user profile" class="center img-thumbnail" />
+              <hr>
+              <% if (user) { %>
+                <table class="table table-striped">
+                  <tr><td><strong><%= user.email %></strong></td></tr>
+                  <tr><td><strong><%= user.name %></strong></td></tr>
+                  <tr><td><strong><%= user.dni %></strong></td></tr>
+                  <tr><td><strong><%= user.phone %></strong></td></tr>
+                  <tr><td><strong><%= user.country %></strong></td></tr>
+                  <tr><td><strong><%= user.city %></strong></td></tr>
+                  <tr>
+                    <td>
+                      <span class="label label-warning">Mis intereses</span>
+                      <% user.interests.forEach((item) => { %>
+                        <span class="label label-info"><%= item %></span>
+                      <% }) %>
+                    </td>
+                  </tr>
+                </table>
+              <% } %>
+              <hr>
+            </div>
+
+            <div class="col-md-9" id="mapid"></div>
+
+
+          </div>
+
+          <% if (markers) { %>
+            <script type="text/javascript">
+              let interests = [];
+              let markers = [];
+              let urlserver = '<%= urlimg %>';
+              <% user.interests.forEach((key) => { %>
+                console.log('<%- key %>');
+                interests.push('<%- key %>');
+              <% }); %>
+
+              markers = <%- markers %>;
+              console.log(interests);
+              console.log(markers);
+            </script>
+          <% } %>
+
+      </main>
+    </div>
+    <%include ../partials/footer %>
+
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js" integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg==" crossorigin=""></script>
+    <script src="/javascripts/leaflet.awesome-markers.js"></script>
+    <script src="/javascripts/markers_style.js"></script>
+    <script type="text/javascript">
+      let mkloaded = {}
+
+
+      var cur_layers = {};
+      var layer_names = [];
+      for (let i = 0; i < interests.length; ++i) {
+        cur_layers[interests[i]] = new L.layerGroup();
+        layer_names.push(interests[i]);
+      }
+      console.log(cur_layers);
+      var mymap = L.map('mapid').setView([4.81333, -75.69611], 15);
+
+      if (markers) {
+        for (let i = 0; i < markers.length; i++) {
+
+            if(!markers[i].active || layer_names.indexOf(markers[i].type) === -1) continue;
+            mkloaded[markers[i]._id] = markers[i];
+
+            var mkt = L.marker([markers[i].lat, markers[i].lon], {icon : markerIcons[markers[i].type]}).addTo(cur_layers[markers[i].type]);
+
+            let html = "<h4>" + markers[i].name + "</h4>" + " <br>"
+            html += '<img src="' + urlserver + 'media/' + markers[i].namemedia + '" width="250px" alt=" event image"/>'
+            html += "<p>" + markers[i].description + "</p>"
+            html +=  "<input type='hidden' value='*" + markers[i]._id + "*' />"
+            mkt.bindPopup(html);
+            mkt.addEventListener('click', modify_marker);
+            console.log(html);
+        }
+      }
+
+      function modify_marker(event) {
+        console.log('click')
+      }
+      //L.marker([4.81333, -75.69611], {icon: testMarker}).addTo(mymap);
+
+      mbUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiY2FybG9zNHJpYXMiLCJhIjoiY2oycTZ2cTZwMDJmZDMzbm5va3JlcTRiYiJ9.8ThnPbr6MsL9jKJvWQOzAg';
+
+      var grayscale   = L.tileLayer(mbUrl, {id: 'mapbox.light'}),
+    		streets  = L.tileLayer(mbUrl, {id: 'mapbox.streets'});
+
+
+      L.tileLayer('https://api.mapbox.com/styles/v1/carlos4rias/cj2vvtnlj000m2rpaawmien1z/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY2FybG9zNHJpYXMiLCJhIjoiY2oycTZ2cTZwMDJmZDMzbm5va3JlcTRiYiJ9.8ThnPbr6MsL9jKJvWQOzAg', {
+          attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+          maxZoom: 15,
+          minZoom: 10,
+          layers: layer_names,
+          id: 'your.mapbox.project.id',
+          accessToken: 'pk.eyJ1IjoiY2FybG9zNHJpYXMiLCJhIjoiY2oycTZ2cTZwMDJmZDMzbm5va3JlcTRiYiJ9.8ThnPbr6MsL9jKJvWQOzAg'
+      }).addTo(mymap);
+
+
+      var baseLayers = {
+    		"Grayscale": grayscale,
+    		"Streets": streets
+    	};
+
+      // L.control.layers(baseLayers, overlays).addTo(mymap);
+      L.control.layers(baseLayers, cur_layers).addTo(mymap);
+
+
+
+   </script>
+  </body>
+</html>

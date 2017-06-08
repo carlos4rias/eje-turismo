@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include ../partials/head %>
+  </head>
+  <body>
+    <header>
+      <% include ../partials/header %>
+    </header>
+    <div class="container">
+      <% if (message.length > 0) { %>
+          <div class="alert alert-danger"><%= message %></div>
+      <% } %>
+    <main>
+      <div class="row">
+        <div class="col-sm-6 col-sm-offset-3">
+          <h3>Nuevo usuario</h3>
+          <form method="post" action="/user/signup">
+            <div class="form-group">
+              <label for="name">Nombre</label>
+              <input type="text" class="form-control" id="name" name="name" placeholder="Nombre" required>
+            </div>
+            <div class="form-group">
+              <label for="dni">DNI</label>
+              <input type="text" class="form-control" id="dni" name="dni" placeholder="DNI" required>
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+            </div>
+            <div class="form-group">
+              <label for="country">Pais</label>
+              <select class="form-control" id="country" name="country">
+                <option value="Colombia">Colombia</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="city">Ciudad</label>
+              <select class="form-control" id="city" name="city">
+                <option value="Pereira">Pereira</option>
+                <option value="Manizales">Manizales</option>
+                <option value="Armenia">Armenia</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Telefono</label>
+              <input type="text" class="form-control" id="phone" name="phone" placeholder="Phone" required>
+            </div>
+            <div class="form-group">
+              <label>Tipo de usuario</label><br>
+              <div class="radio">
+                <label>
+                  <input type="radio" name="role" id="role1" value="admin">
+                  Administrador
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input type="radio" name="role" id="role2" value="suscriber" checked>
+                  Suscriptor
+                </label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="interest">Intereses</label><br>
+              <label class="checkbox-inline"><input type="checkbox" name="interest" value="Hoteleria">Hoteleria</label>
+              <label class="checkbox-inline"><input type="checkbox" name="interest" value="Eventos">Eventos</label>
+              <label class="checkbox-inline"><input type="checkbox" name="interest" value="Gastronomia">Gastronomia</label>
+            </div>
+            <div>
+              <button type="submit" class="btn btn-primary form-control">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+    </div>
+
+    <%include ../partials/footer %>
+  </body>
+</html>
